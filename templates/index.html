@@ -21,7 +21,7 @@
             font-size: 2em;
             margin: 0 10px;
         }
-        .angle-display {
+        .angle-input {
             font-size: 2em;
             width: 100px;
             text-align: center;
@@ -35,39 +35,47 @@
 <body>
     <div class="controller">
         <button id="decrease">-</button>
-        <div id="current-angle" class="angle-display">0</div>
+        <input type="number" id="current-angle" class="angle-input" value="90" min="0" max="90">
         <button id="increase">+</button>
     </div>
     <div class="textbox">
-        Current Angle: <input type="text" id="angle-input" value="0" readonly>
+        Current Angle: <input type="text" id="angle-display" value="90" readonly>
     </div>
 
     <script>
-        const currentAngleDisplay = document.getElementById('current-angle');
-        const angleInput = document.getElementById('angle-input');
-        let currentAngle = 0;  // Initial angle
+        const currentAngleInput = document.getElementById('current-angle');
+        const angleDisplay = document.getElementById('angle-display');
+        let currentAngle = 90;  // Initial angle
 
         document.getElementById('decrease').addEventListener('click', () => {
             if (currentAngle > 0) {
                 currentAngle -= 1;
                 updateAngle();
-                // Make an API call to update the servo angle on the server
                 updateServoAngle(currentAngle);
             }
         });
 
         document.getElementById('increase').addEventListener('click', () => {
-            if (currentAngle < 180) {
+            if (currentAngle < 90) {
                 currentAngle += 1;
                 updateAngle();
-                // Make an API call to update the servo angle on the server
                 updateServoAngle(currentAngle);
             }
         });
 
+        currentAngleInput.addEventListener('change', () => {
+            const angle = parseInt(currentAngleInput.value);
+            if (angle >= 0 && angle <= 90) {
+                currentAngle = angle;
+                updateAngle();
+                updateServoAngle(currentAngle);
+            } else {
+                currentAngleInput.value = currentAngle;  // Reset to current angle if out of range
+            }
+        });
+
         function updateAngle() {
-            currentAngleDisplay.textContent = currentAngle;
-            angleInput.value = currentAngle;
+            angleDisplay.value = currentAngle;
         }
 
         function updateServoAngle(angle) {
