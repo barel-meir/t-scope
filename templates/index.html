@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servo Control</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .controller {
+            display: flex;
+            align-items: center;
+        }
+        .controller button {
+            font-size: 2em;
+            margin: 0 10px;
+        }
+        .angle-display {
+            font-size: 2em;
+            width: 100px;
+            text-align: center;
+        }
+        .textbox {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="controller">
+        <button id="decrease">-</button>
+        <div id="current-angle" class="angle-display">0</div>
+        <button id="increase">+</button>
+    </div>
+    <div class="textbox">
+        Current Angle: <input type="text" id="angle-input" value="0" readonly>
+    </div>
+
+    <script>
+        const currentAngleDisplay = document.getElementById('current-angle');
+        const angleInput = document.getElementById('angle-input');
+        let currentAngle = 0;  // Initial angle
+
+        document.getElementById('decrease').addEventListener('click', () => {
+            if (currentAngle > 0) {
+                currentAngle -= 1;
+                updateAngle();
+                // Make an API call to update the servo angle on the server
+                updateServoAngle(currentAngle);
+            }
+        });
+
+        document.getElementById('increase').addEventListener('click', () => {
+            if (currentAngle < 180) {
+                currentAngle += 1;
+                updateAngle();
+                // Make an API call to update the servo angle on the server
+                updateServoAngle(currentAngle);
+            }
+        });
+
+        function updateAngle() {
+            currentAngleDisplay.textContent = currentAngle;
+            angleInput.value = currentAngle;
+        }
+
+        function updateServoAngle(angle) {
+            fetch('/set_angle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ angle: angle }),
+            });
+        }
+    </script>
+</body>
+</html>
